@@ -31,11 +31,11 @@ public class CpuBenchmark {
             }
 
             startLatch.await();
-            Thread.sleep(timeMillis);
 
+            Thread.sleep(timeMillis);
             isRunning.set(false);
+
             finishLatch.await();
-            executor.shutdown();
 
             long total = 0;
 
