@@ -12,17 +12,16 @@ public class CpuBenchmark {
 
         PriorityBlockingQueue<Score> scores = new PriorityBlockingQueue<>(threads);
 
-        CountDownLatch startLatch = new CountDownLatch(threads);
+        CyclicBarrier startBarrier = new CyclicBarrier(threads + 1);
         CountDownLatch finishLatch = new CountDownLatch(threads);
 
         try (ExecutorService executor = Executors.newFixedThreadPool(threads, Thread.ofPlatform().factory())) {
             for (int i = 0; i < threads; i++) {
                 int threadNumber = i;
                 executor.submit(() -> {
-                    startLatch.countDown();
                     try {
-                        startLatch.await();
-                    } catch (InterruptedException e) {
+                        startBarrier.await();
+                    } catch (InterruptedException | BrokenBarrierException e) {
                         throw new RuntimeException(e);
                     }
                     compute(threadNumber, isRunning, scores);
@@ -30,7 +29,7 @@ public class CpuBenchmark {
                 });
             }
 
-            startLatch.await();
+            startBarrier.await();
 
             Thread.sleep(duration);
             isRunning.set(false);
