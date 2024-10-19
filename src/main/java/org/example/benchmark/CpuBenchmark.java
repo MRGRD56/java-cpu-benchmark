@@ -1,10 +1,8 @@
 package org.example.benchmark;
 
 import java.util.Comparator;
-import java.util.UUID;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicLong;
 
 public class CpuBenchmark {
     public long testCpu(int threads, long timeMillis) {
@@ -17,12 +15,7 @@ public class CpuBenchmark {
         CountDownLatch startLatch = new CountDownLatch(threads);
 
         try (ExecutorService executor = Executors.newFixedThreadPool(threads, Thread.ofPlatform().factory())) {
-            executor.submit(() -> {
-                startLatch.countDown();
-                compute(0, isRunning, scores);
-            });
-
-            for (int i = 1; i < threads; i++) {
+            for (int i = 0; i < threads; i++) {
                 int threadNumber = i;
                 executor.submit(() -> {
                     startLatch.countDown();
