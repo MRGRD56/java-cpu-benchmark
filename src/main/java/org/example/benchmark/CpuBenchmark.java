@@ -13,13 +13,20 @@ public class CpuBenchmark {
         PriorityBlockingQueue<Score> scores = new PriorityBlockingQueue<>(threads);
 
         CountDownLatch startLatch = new CountDownLatch(threads);
+        CountDownLatch finishLatch = new CountDownLatch(threads);
 
         try (ExecutorService executor = Executors.newFixedThreadPool(threads, Thread.ofPlatform().factory())) {
             for (int i = 0; i < threads; i++) {
                 int threadNumber = i;
                 executor.submit(() -> {
                     startLatch.countDown();
+                    try {
+                        startLatch.await();
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
                     compute(threadNumber, isRunning, scores);
+                    finishLatch.countDown();
                 });
             }
 
@@ -27,7 +34,7 @@ public class CpuBenchmark {
             Thread.sleep(timeMillis);
 
             isRunning.set(false);
-            executor.awaitTermination(3, TimeUnit.SECONDS);
+            finishLatch.await();
             executor.shutdown();
 
             long total = 0;
