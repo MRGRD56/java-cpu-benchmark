@@ -5,8 +5,8 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class CpuBenchmark {
-    public long testCpu(int threads, long timeMillis) {
-        System.out.println("Benchmarking CPU with threads=" + threads + " and time=" + timeMillis);
+    public long testCpu(int threads, long duration) {
+        System.out.println("Benchmarking CPU with threads=" + threads + " and duration=" + duration);
 
         AtomicBoolean isRunning = new AtomicBoolean(true);
 
@@ -32,7 +32,7 @@ public class CpuBenchmark {
 
             startLatch.await();
 
-            Thread.sleep(timeMillis);
+            Thread.sleep(duration);
             isRunning.set(false);
 
             finishLatch.await();
